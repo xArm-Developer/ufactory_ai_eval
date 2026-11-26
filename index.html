@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN" style="scroll-behavior:smooth">
+<html lang="en" style="scroll-behavior:smooth">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>UFACTORY AI | xArm6 具身智能物理操作评测报告 (AA-Robotics Benchmark)</title>
+  <meta name="referrer" content="strict-origin-when-cross-origin"/>
+  <title>UFACTORY AI | xArm6 Tabletop Manipulation Benchmark (AA-Robotics)</title>
   <link rel="icon" type="image/png" href="favicon.png"/>
   <link rel="icon" href="favicon.ico"/>
   <meta name="theme-color" content="#F0662F"/>
@@ -174,6 +175,41 @@
     .uf-ft__social a:hover { color: var(--uf-main); }
     .uf-ft__copy-row { display: flex; align-items: center; gap: 22px; }
     .uf-ft__copy { margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.45); }
+
+    /* Custom Minimal Inline YouTube Player */
+    .uf-yt-stage { position: relative; background: #0a0a0a; overflow: hidden; user-select: none; -webkit-user-select: none; }
+    .uf-yt-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; pointer-events: none; }
+    .uf-yt-shield { display: block; position: absolute; inset: 0; z-index: 10; cursor: pointer; text-decoration: none; }
+    .uf-yt-end { position: absolute; inset: 0; z-index: 15; background: #0a0a0a; display: none; }
+    .uf-yt-end.active { display: block; }
+    .uf-yt-end a { display: block; position: absolute; inset: 0; }
+    .uf-yt-end img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .uf-yt-replay {
+      position: absolute; bottom: 12px; left: 12px; z-index: 25; width: 40px; height: 40px;
+      border-radius: 8px; background: rgba(0, 0, 0, 0.62); backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.26); display: flex; align-items: center;
+      justify-content: center; cursor: pointer; padding: 0;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+    .uf-yt-replay:hover { background: #F0662F; border-color: #F0662F; transform: scale(1.05); }
+    .uf-yt-bar {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; padding: 14px 10px 7px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0));
+      opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
+    }
+    .uf-yt-stage.ui-visible .uf-yt-bar { opacity: 1; pointer-events: auto; }
+    .uf-yt-stage.ended .uf-yt-bar { opacity: 0 !important; pointer-events: none !important; }
+    .uf-yt-prog-wrap { width: 100%; height: 10px; display: flex; align-items: center; cursor: pointer; margin-bottom: 3px; }
+    .uf-yt-prog-track { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.28); border-radius: 999px; overflow: hidden; transition: height 0.12s ease; }
+    .uf-yt-prog-wrap:hover .uf-yt-prog-track { height: 5px; }
+    .uf-yt-prog-fill { height: 100%; width: 0%; background: #F0662F; border-radius: 999px; }
+    .uf-yt-btn {
+      background: transparent; border: 0; color: rgba(255, 255, 255, 0.92); width: 26px; height: 26px;
+      border-radius: 5px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; text-decoration: none; transition: background 0.15s ease, color 0.15s ease;
+    }
+    .uf-yt-btn:hover { background: rgba(255, 255, 255, 0.16); color: #ffffff; }
+    .uf-yt-btn svg { width: 16px; height: 16px; fill: currentColor; }
   </style>
 </head>
 <body class="bg-white text-neutral-900 antialiased selection:bg-[#F0662F] selection:text-white">
@@ -189,23 +225,23 @@
       </div>
 
       <nav id="top-nav-links" class="hidden xl:flex items-center gap-0.5 bg-[#F4F3F2] rounded-full p-1 border border-neutral-200/80 text-xs font-medium">
-        <a href="#results" data-nav="results" onclick="navigateToSection('results', event)" class="top-nav-item px-3 py-1.5 rounded-full bg-white text-[#F0662F] font-semibold shadow-sm transition-all whitespace-nowrap">评测结果</a>
-        <a href="#global-architecture" data-nav="global-architecture" onclick="navigateToSection('global-architecture', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">系统原理</a>
-        <a href="#leaderboard" data-nav="leaderboard" onclick="navigateToSection('leaderboard', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">得分榜单</a>
-        <a href="#tasks" data-nav="tasks" onclick="navigateToSection('tasks', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">闭环流程</a>
-        <a href="#cost-and-time" data-nav="cost-and-time" onclick="navigateToSection('cost-and-time', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">耗时与成本</a>
-        <a href="#model-behavior" data-nav="model-behavior" onclick="navigateToSection('model-behavior', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">时间分配</a>
-        <a href="#physical-accuracy" data-nav="physical-accuracy" onclick="navigateToSection('physical-accuracy', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">物理精度</a>
-        <a href="#telemetry-table" data-nav="telemetry-table" onclick="navigateToSection('telemetry-table', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">遥测数据</a>
+        <a href="#results" data-nav="results" onclick="navigateToSection('results', event)" class="top-nav-item px-3 py-1.5 rounded-full bg-white text-[#F0662F] font-semibold shadow-sm transition-all whitespace-nowrap">Results</a>
+        <a href="#global-architecture" data-nav="global-architecture" onclick="navigateToSection('global-architecture', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">How It Works</a>
+        <a href="#leaderboard" data-nav="leaderboard" onclick="navigateToSection('leaderboard', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">Leaderboard</a>
+        <a href="#tasks" data-nav="tasks" onclick="navigateToSection('tasks', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">Phases</a>
+        <a href="#cost-and-time" data-nav="cost-and-time" onclick="navigateToSection('cost-and-time', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">Time &amp; Cost</a>
+        <a href="#model-behavior" data-nav="model-behavior" onclick="navigateToSection('model-behavior', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">Activity</a>
+        <a href="#physical-accuracy" data-nav="physical-accuracy" onclick="navigateToSection('physical-accuracy', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">Accuracy</a>
+        <a href="#telemetry-table" data-nav="telemetry-table" onclick="navigateToSection('telemetry-table', event)" class="top-nav-item px-3 py-1.5 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-white/60 transition-all whitespace-nowrap">Telemetry</a>
       </nav>
 
       <div class="flex items-center gap-2.5 flex-shrink-0">
         <div class="inline-flex items-center bg-[#F4F3F2] p-0.5 rounded-full border border-neutral-200/90 text-xs font-semibold">
-          <button id="lang-btn-zh" onclick="setLanguage('zh')" class="px-2.5 py-1 rounded-full bg-[#F0662F] text-white shadow-xs transition-all cursor-pointer">中文</button>
-          <button id="lang-btn-en" onclick="setLanguage('en')" class="px-2.5 py-1 rounded-full text-neutral-600 hover:text-neutral-950 transition-all cursor-pointer">EN</button>
+          <button id="lang-btn-zh" onclick="setLanguage('zh')" class="px-2.5 py-1 rounded-full text-neutral-600 hover:text-neutral-950 transition-all cursor-pointer">中文</button>
+          <button id="lang-btn-en" onclick="setLanguage('en')" class="px-2.5 py-1 rounded-full bg-[#F0662F] text-white shadow-xs transition-all cursor-pointer">EN</button>
         </div>
 
-        <a href="https://github.com/xArm-Developer" target="_blank" rel="noopener noreferrer" class="uf-hex-btn hidden sm:inline-flex" title="xArm-Developer GitHub">
+        <a href="https://github.com/xArm-Developer/ufactory_ai_eval" target="_blank" rel="noopener noreferrer" class="uf-hex-btn hidden sm:inline-flex" title="ufactory_ai_eval GitHub">
           <svg class="uf-hex-border" viewBox="0 0 41.5 47.5" aria-hidden="true">
             <path d="M19.409,0.802 C20.111,0.390 20.976,0.390 21.679,0.799 L39.350,11.102 C40.057,11.515 40.492,12.280 40.491,13.109 L40.450,33.790 C40.448,34.612 40.014,35.373 39.312,35.784 L21.583,46.169 C20.881,46.582 20.016,46.583 19.313,46.172 L1.641,35.869 C0.935,35.456 0.499,34.691 0.501,33.863 L0.543,13.181 C0.544,12.360 0.977,11.599 1.680,11.187 L19.409,0.802 Z"/>
           </svg>
@@ -214,8 +250,8 @@
           </svg>
         </a>
 
-        <a id="uf-hd-contact-link" href="https://cn.ufactory.cc/zh-cn/contact" target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex items-center justify-center h-9 px-4 rounded-full bg-[#F0662F] hover:bg-[#E84626] text-white text-xs font-semibold transition-all whitespace-nowrap">
-          联系我们
+        <a id="uf-hd-contact-link" href="https://www.ufactory.cc/contact" target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex items-center justify-center h-9 px-4 rounded-full bg-[#F0662F] hover:bg-[#E84626] text-white text-xs font-semibold transition-all whitespace-nowrap">
+          Contact Us
         </a>
       </div>
     </div>
@@ -272,42 +308,42 @@
       <div class="flex flex-wrap items-center gap-3 text-xs">
         <span class="inline-flex items-center gap-2 font-semibold tracking-[0.1em] uppercase text-[#F0662F]">
           <span class="h-2 w-2 rounded-full bg-[#F0662F]"></span>
-          <span id="hero-kicker-txt">UFACTORY 具身智能 · 04 模型评估</span>
+          <span id="hero-kicker-txt">UFACTORY AI · 04 MODEL EVALUATION</span>
         </span>
         <span class="text-neutral-300">|</span>
         <a id="hero-ref-link" class="inline-flex items-center gap-1 text-neutral-500 hover:text-[#F0662F] transition-colors" href="https://artificialanalysis.ai/articles/aa-robotics" target="_blank" rel="noopener noreferrer">
-          参考基准：Artificial Analysis AA-Robotics v0.1 ↗
+          Reference: Artificial Analysis AA-Robotics v0.1 ↗
         </a>
       </div>
 
       <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm text-neutral-500">
-        <span id="hero-date-span">2026 年 11 月</span>
+        <span id="hero-date-span">November 2026</span>
         <span class="hidden sm:inline text-neutral-300">·</span>
         <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-neutral-200/90 text-xs text-neutral-600 shadow-2xs">
-          <span class="h-1.5 w-1.5 rounded-full bg-[#F0662F] flex-shrink-0"></span><span id="top-badge-text">xArm6 · 入盒 · 叠木块 · 叠毛巾 · 翻筛子</span>
+          <span class="h-1.5 w-1.5 rounded-full bg-[#F0662F] flex-shrink-0"></span><span id="top-badge-text">xArm6 · Pick · Stack · Towel · Dice</span>
         </span>
       </div>
 
       <h1 id="hero-main-h1" class="mt-3.5 max-w-5xl break-words text-2xl sm:text-3xl lg:text-[34px] font-semibold leading-[1.25] tracking-[-0.01em] text-[#3f4652]">
-        xArm6 桌面物理操作评测报告<span class="block mt-1.5">（AA-Robotics 四大任务与三模型对比）</span>
+        xArm6 Tabletop Manipulation Benchmark<span class="block mt-1.5">(4 Tasks Across 3 Models)</span>
       </h1>
 
       <p id="hero-main-desc" class="mt-4 max-w-5xl break-words text-sm sm:text-[15px] leading-relaxed text-neutral-600">
-        参照 AA-Robotics v0.1 评测标准，本报告在同一套物理工作站（UFACTORY xArm6 + 平行夹爪 + 腕部 RealSense D405 RGB-D + 全局 RealSense D555 / Insta360 Link 2C）上，系统评测并对比了 GPT-6 Astra、Gemini 4 Argon 与 Claude Fable 5.2 在红木块入盒、三方块叠放、桌面翻筛子与桌面叠毛巾四大物理操作任务上的得分、耗时、Token 成本、五类活动时间分配与双机位实拍证据。
+        Modeled after the AA-Robotics v0.1 benchmark, this report evaluates and compares GPT-6 Astra, Gemini 4 Argon, and Claude Fable 5.2 on the identical physical workcell (UFACTORY xArm6 + parallel gripper + wrist RealSense D405 RGB-D + scene RealSense D555 / Insta360 Link 2C) across four physical manipulation tasks: Red Cube Pick &amp; Place, 3-Cube Precision Stacking, Die Flipping, and Deformable Towel Folding.
       </p>
 
       <div class="mt-7 flex flex-wrap items-center gap-3">
         <button type="button" id="task-tab-pick" onclick="switchTaskTab('pick')" class="inline-flex items-center justify-center gap-2 rounded-full bg-[#F0662F] text-white h-10 px-6 py-2 text-sm font-semibold shadow-sm transition-all cursor-pointer">
-          红木块入盒
+          Red Cube Pick &amp; Place
         </button>
         <button type="button" id="task-tab-stack" onclick="switchTaskTab('stack')" class="inline-flex items-center justify-center gap-2 rounded-full bg-white border border-neutral-300/90 text-neutral-700 hover:border-[#F0662F] hover:text-[#F0662F] h-10 px-6 py-2 text-sm font-medium shadow-2xs transition-all cursor-pointer">
-          三方块叠放
+          3-Cube Stacking
         </button>
         <button type="button" id="task-tab-dice" onclick="switchTaskTab('dice')" class="inline-flex items-center justify-center gap-2 rounded-full bg-white border border-neutral-300/90 text-neutral-700 hover:border-[#F0662F] hover:text-[#F0662F] h-10 px-6 py-2 text-sm font-medium shadow-2xs transition-all cursor-pointer">
-          桌面翻筛子
+          Die Flipping
         </button>
         <button type="button" id="task-tab-towel" onclick="switchTaskTab('towel')" class="inline-flex items-center justify-center gap-2 rounded-full bg-white border border-neutral-300/90 text-neutral-700 hover:border-[#F0662F] hover:text-[#F0662F] h-10 px-6 py-2 text-sm font-medium shadow-2xs transition-all cursor-pointer">
-          桌面叠毛巾
+          Towel Folding
         </button>
       </div>
     </div>
@@ -589,12 +625,7 @@
                 <p class="text-xs text-neutral-500 mt-0.5" id="pick-video-sub">Gemini 4 Argon · 四阶段 RGB-D 闭环视觉伺服与 SE(2) 旋转对齐入盒实录</p>
               </div>
             </div>
-            <div class="rounded-lg border border-neutral-200 bg-neutral-950 overflow-hidden">
-              <video controls preload="metadata" class="w-full max-h-[360px] object-contain mx-auto">
-                <source src="agy/gemini_cube_pick.mp4" type="video/mp4"/>
-                您的浏览器不支持 HTML5 视频播放。
-              </video>
-            </div>
+            <div id="video-slot-pick" class="rounded-lg border border-neutral-200 bg-neutral-950 overflow-hidden"></div>
           </div>
 
           <!-- AA-Robotics Score Card -->
@@ -871,12 +902,7 @@
                 <p class="text-xs text-neutral-500 mt-0.5" id="stack-video-sub">Gemini 4 Argon · 底层绿 · 中层黄 · 顶层红三层四边齐平叠放实录</p>
               </div>
             </div>
-            <div class="rounded-lg border border-neutral-200 bg-neutral-950 overflow-hidden">
-              <video controls preload="metadata" class="w-full max-h-[360px] object-contain mx-auto">
-                <source src="agy/gemini_cube_stacking.mp4" type="video/mp4"/>
-                您的浏览器不支持 HTML5 视频播放。
-              </video>
-            </div>
+            <div id="video-slot-stack" class="rounded-lg border border-neutral-200 bg-neutral-950 overflow-hidden"></div>
           </div>
 
           <!-- AA-Robotics Score Card for 3-Cube Stacking (Only Run All & Run 1) -->
@@ -1235,23 +1261,13 @@
                 <div class="flex items-center justify-between mb-1.5 text-xs">
                   <span class="font-bold text-[#D97706]">Claude Fable 5.2 · Towel Folding</span>
                 </div>
-                <div class="rounded overflow-hidden border border-neutral-200 bg-neutral-950">
-                  <video controls preload="metadata" class="w-full max-h-[240px] object-contain mx-auto">
-                    <source src="claude/claude_towel_folding.mp4" type="video/mp4"/>
-                    您的浏览器不支持 HTML5 视频播放。
-                  </video>
-                </div>
+                <div id="video-slot-towel-claude" class="rounded overflow-hidden border border-neutral-200 bg-neutral-950"></div>
               </div>
               <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-2.5">
                 <div class="flex items-center justify-between mb-1.5 text-xs">
                   <span class="font-bold text-[#8842FD]">Gemini 4 Argon · Towel Folding</span>
                 </div>
-                <div class="rounded overflow-hidden border border-neutral-200 bg-neutral-950">
-                  <video controls preload="metadata" class="w-full max-h-[240px] object-contain mx-auto">
-                    <source src="agy/gemini_towel_folding.mp4" type="video/mp4"/>
-                    您的浏览器不支持 HTML5 视频播放。
-                  </video>
-                </div>
+                <div id="video-slot-towel-gemini" class="rounded overflow-hidden border border-neutral-200 bg-neutral-950"></div>
               </div>
             </div>
           </div>
@@ -1609,12 +1625,7 @@
                 <p class="text-xs text-neutral-500 mt-0.5" id="dice-video-sub">GPT-6 Astra · 朝上点数减 2 视觉闭环与 60° 倾转翻面实录</p>
               </div>
             </div>
-            <div class="rounded-lg border border-neutral-200 bg-neutral-950 overflow-hidden">
-              <video controls preload="metadata" class="w-full max-h-[360px] object-contain mx-auto">
-                <source src="gpt/gpt6_die_flipping.mp4" type="video/mp4"/>
-                您的浏览器不支持 HTML5 视频播放。
-              </video>
-            </div>
+            <div id="video-slot-dice" class="rounded-lg border border-neutral-200 bg-neutral-950 overflow-hidden"></div>
           </div>
 
           <!-- AA-Robotics Score Card for Die Flipping (Identical Artificial Analysis Style to Towel Folding) -->
@@ -3305,7 +3316,7 @@
       if (bestRun && bestDist < 30) selectRun(bestRun);
     });
 
-    let currentLang = "zh";
+    let currentLang = "en";
     let currentHeroIdx = 0;
     let currentStackIdx = 4;
     let currentMetricMode = "dur";
@@ -5003,6 +5014,296 @@
         currentLang === "zh" ? HERO_STAGES[idx].caption : HERO_CAPTIONS_EN[idx];
     };
 
+    const TASK_VIDEO_SLOTS = [
+      { id: "video-slot-pick", tab: "pick", ytid: "aDFzTV0Jo84", bvid: "BV1QsyHzrEK7", title: "Red Cube Pick & Place", iframeCls: "max-w-[760px] mx-auto aspect-video" },
+      { id: "video-slot-stack", tab: "stack", ytid: "euBNAgtial4", bvid: "BV1aWyHzGExr", title: "3-Cube Precision Stacking", iframeCls: "max-w-[760px] mx-auto aspect-video" },
+      { id: "video-slot-towel-claude", tab: "towel", ytid: "yHpGEILZ0ZE", bvid: "BV18tyHzzEiX", title: "Claude Fable 5.2 Towel Folding", iframeCls: "aspect-video" },
+      { id: "video-slot-towel-gemini", tab: "towel", ytid: "OrgUcgrZdaU", bvid: "BV13WyHzGEkS", title: "Gemini 4 Argon Towel Folding", iframeCls: "aspect-video" },
+      { id: "video-slot-dice", tab: "dice", ytid: "9W98FFWNacE", bvid: "BV1gtyHzzEcn", title: "GPT-6 Astra Die Flipping", iframeCls: "max-w-[760px] mx-auto aspect-video" }
+    ];
+
+    const activeYtControllers = {};
+    let ytApiLoading = false;
+    const ytApiCallbacks = [];
+
+    function ensureYoutubeIframeApi(cb) {
+      if (window.YT && window.YT.Player) {
+        cb();
+        return;
+      }
+      ytApiCallbacks.push(cb);
+      if (ytApiLoading) return;
+      ytApiLoading = true;
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = function () {
+        if (typeof prev === "function") prev();
+        while (ytApiCallbacks.length) {
+          const fn = ytApiCallbacks.shift();
+          try { fn(); } catch (_) {}
+        }
+      };
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
+    }
+
+    function destroyYtSlotController(slotId) {
+      const ctrl = activeYtControllers[slotId];
+      if (!ctrl) return;
+      ctrl.disposed = true;
+      if (ctrl.hideTimer) clearTimeout(ctrl.hideTimer);
+      if (ctrl.rafId) cancelAnimationFrame(ctrl.rafId);
+      if (ctrl.player && typeof ctrl.player.destroy === "function") {
+        try { ctrl.player.destroy(); } catch (_) {}
+      }
+      delete activeYtControllers[slotId];
+    }
+
+    function fmtYtSec(sec) {
+      sec = Math.max(0, Math.floor(sec || 0));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return m + ":" + (s < 10 ? "0" : "") + s;
+    }
+
+    function activateYoutubeSlot(slotId) {
+      const slot = TASK_VIDEO_SLOTS.find(s => s.id === slotId);
+      const el = document.getElementById(slotId);
+      if (!slot || !el) return;
+      const watchUrl = `https://www.youtube.com/watch?v=${slot.ytid}`;
+      if (window.location.protocol === "file:") {
+        window.open(watchUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      destroyYtSlotController(slotId);
+      const iframeId = "uf-yt-iframe-" + slot.id;
+      const originParam = `&origin=${encodeURIComponent(window.location.origin)}`;
+      const embedSrc = `https://www.youtube.com/embed/${slot.ytid}?enablejsapi=1&autoplay=1&controls=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&disablekb=1&fs=0${originParam}`;
+
+      el.innerHTML = `
+        <div class="uf-yt-stage w-full ${slot.iframeCls}">
+          <iframe id="${iframeId}" class="uf-yt-frame" src="${embedSrc}" title="${slot.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <a class="uf-yt-shield" href="${watchUrl}" target="_blank" rel="noopener noreferrer" title="Watch ${slot.title} on YouTube"></a>
+          <div class="uf-yt-end">
+            <a href="${watchUrl}" target="_blank" rel="noopener noreferrer" title="Watch ${slot.title} on YouTube">
+              <img src="https://i.ytimg.com/vi/${slot.ytid}/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${slot.ytid}/mqdefault.jpg';" alt="${slot.title}"/>
+            </a>
+            <button type="button" class="uf-yt-replay" title="Replay inline" aria-label="Replay ${slot.title}">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" style="margin-left:2px"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+            </button>
+          </div>
+          <div class="uf-yt-bar">
+            <div class="uf-yt-prog-wrap"><div class="uf-yt-prog-track"><div class="uf-yt-prog-fill"></div></div></div>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                <button type="button" class="uf-yt-btn uf-js-play" title="Play / Pause">
+                  <svg class="uf-ico-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+                  <svg class="uf-ico-play" viewBox="0 0 24 24" style="display:none"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+                </button>
+                <span class="uf-js-time text-[11px] text-white/85 font-mono">0:00 / 0:00</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" class="uf-yt-btn uf-js-mute" title="Mute / Unmute">
+                  <svg class="uf-ico-vol" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                  <svg class="uf-ico-muted" viewBox="0 0 24 24" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
+                </button>
+                <button type="button" class="uf-yt-btn uf-js-fs" title="Fullscreen">
+                  <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      el.dataset.videoState = "en-playing:" + slot.ytid;
+
+      const stage = el.querySelector(".uf-yt-stage");
+      const shield = el.querySelector(".uf-yt-shield");
+      const endPoster = el.querySelector(".uf-yt-end");
+      const replayBtn = el.querySelector(".uf-yt-replay");
+      const playBtn = el.querySelector(".uf-js-play");
+      const icoPause = el.querySelector(".uf-ico-pause");
+      const icoPlay = el.querySelector(".uf-ico-play");
+      const muteBtn = el.querySelector(".uf-js-mute");
+      const icoVol = el.querySelector(".uf-ico-vol");
+      const icoMuted = el.querySelector(".uf-ico-muted");
+      const fsBtn = el.querySelector(".uf-js-fs");
+      const progWrap = el.querySelector(".uf-yt-prog-wrap");
+      const progFill = el.querySelector(".uf-yt-prog-fill");
+      const timeLbl = el.querySelector(".uf-js-time");
+
+      const ctrl = { player: null, ready: false, hideTimer: null, rafId: null, disposed: false };
+      activeYtControllers[slotId] = ctrl;
+
+      function syncPlayIcon(playing) {
+        icoPause.style.display = playing ? "" : "none";
+        icoPlay.style.display = playing ? "none" : "";
+      }
+      function hideUiNow() {
+        clearTimeout(ctrl.hideTimer);
+        stage.classList.remove("ui-visible");
+      }
+      function showUiBriefly() {
+        if (stage.classList.contains("ended")) return;
+        stage.classList.add("ui-visible");
+        clearTimeout(ctrl.hideTimer);
+        ctrl.hideTimer = setTimeout(hideUiNow, 1400);
+      }
+      function showEndCleanPoster() {
+        stage.classList.add("ended");
+        hideUiNow();
+        endPoster.classList.add("active");
+      }
+
+      stage.addEventListener("mousemove", showUiBriefly);
+      stage.addEventListener("mouseleave", hideUiNow);
+
+      shield.addEventListener("click", function () {
+        if (ctrl.ready && ctrl.player && typeof ctrl.player.pauseVideo === "function") {
+          ctrl.player.pauseVideo();
+          showEndCleanPoster();
+        }
+      });
+
+      playBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (!ctrl.ready || !ctrl.player) return;
+        if (ctrl.player.getPlayerState() === 1) {
+          ctrl.player.pauseVideo();
+          syncPlayIcon(false);
+        } else {
+          stage.classList.remove("ended");
+          endPoster.classList.remove("active");
+          ctrl.player.playVideo();
+          syncPlayIcon(true);
+        }
+      });
+
+      replayBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        stage.classList.remove("ended");
+        endPoster.classList.remove("active");
+        if (ctrl.ready && ctrl.player) {
+          ctrl.player.seekTo(0, true);
+          ctrl.player.playVideo();
+          syncPlayIcon(true);
+        }
+      });
+
+      muteBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (!ctrl.ready || !ctrl.player) return;
+        if (ctrl.player.isMuted()) {
+          ctrl.player.unMute();
+          icoVol.style.display = "";
+          icoMuted.style.display = "none";
+        } else {
+          ctrl.player.mute();
+          icoVol.style.display = "none";
+          icoMuted.style.display = "";
+        }
+      });
+
+      fsBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(function () {});
+        } else if (stage.requestFullscreen) {
+          stage.requestFullscreen().catch(function () {});
+        }
+      });
+
+      progWrap.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (!ctrl.ready || !ctrl.player) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const dur = ctrl.player.getDuration() || 0;
+        if (dur > 0) {
+          stage.classList.remove("ended");
+          endPoster.classList.remove("active");
+          ctrl.player.seekTo(ratio * dur, true);
+          ctrl.player.playVideo();
+        }
+      });
+
+      function pollProgress() {
+        if (ctrl.disposed) return;
+        if (ctrl.ready && ctrl.player && typeof ctrl.player.getCurrentTime === "function") {
+          const cur = ctrl.player.getCurrentTime() || 0;
+          const dur = ctrl.player.getDuration() || 0;
+          const st = ctrl.player.getPlayerState();
+          if (dur > 0) {
+            const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
+            progFill.style.width = pct.toFixed(1) + "%";
+            timeLbl.textContent = fmtYtSec(cur) + " / " + fmtYtSec(dur);
+            if (st === 1 && dur - cur <= 0.15) {
+              ctrl.player.pauseVideo();
+              showEndCleanPoster();
+            }
+          }
+        }
+        ctrl.rafId = requestAnimationFrame(pollProgress);
+      }
+
+      ensureYoutubeIframeApi(function () {
+        if (ctrl.disposed || !document.getElementById(iframeId)) return;
+        ctrl.player = new YT.Player(iframeId, {
+          events: {
+            onReady: function () {
+              if (ctrl.disposed) return;
+              ctrl.ready = true;
+              syncPlayIcon(true);
+              ctrl.rafId = requestAnimationFrame(pollProgress);
+            },
+            onStateChange: function (ev) {
+              if (ctrl.disposed) return;
+              if (ev.data === 0) {
+                showEndCleanPoster();
+              } else if (ev.data === 1) {
+                stage.classList.remove("ended");
+                endPoster.classList.remove("active");
+                syncPlayIcon(true);
+              } else if (ev.data === 2) {
+                syncPlayIcon(false);
+              }
+            }
+          }
+        });
+      });
+    }
+
+    function syncTaskVideos() {
+      TASK_VIDEO_SLOTS.forEach(slot => {
+        const el = document.getElementById(slot.id);
+        if (!el) return;
+        if (slot.tab !== currentTaskTab) {
+          destroyYtSlotController(slot.id);
+          if (el.dataset.videoState !== "idle") {
+            el.innerHTML = "";
+            el.dataset.videoState = "idle";
+          }
+          return;
+        }
+        if (currentLang === "zh") {
+          destroyYtSlotController(slot.id);
+          const targetState = "zh:" + slot.bvid;
+          if (el.dataset.videoState !== targetState) {
+            el.innerHTML = `<iframe src="https://player.bilibili.com/player.html?isOutside=true&bvid=${slot.bvid}&p=1&high_quality=1&danmaku=0&autoplay=0" title="${slot.title}" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" referrerpolicy="no-referrer-when-downgrade" class="w-full ${slot.iframeCls} block"></iframe>`;
+            el.dataset.videoState = targetState;
+          }
+        } else {
+          const posterState = "en-poster:" + slot.ytid;
+          const playingState = "en-playing:" + slot.ytid;
+          if (el.dataset.videoState !== posterState && el.dataset.videoState !== playingState) {
+            el.innerHTML = `<div class="group relative w-full ${slot.iframeCls} bg-neutral-950 overflow-hidden"><a href="https://www.youtube.com/watch?v=${slot.ytid}" target="_blank" rel="noopener noreferrer" title="Watch ${slot.title} on YouTube" class="block absolute inset-0 z-10 no-underline"><img src="https://i.ytimg.com/vi/${slot.ytid}/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${slot.ytid}/mqdefault.jpg';" alt="${slot.title}" class="w-full h-full object-contain"/><div class="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/45 to-transparent"></div></a><button type="button" onclick="event.stopPropagation(); activateYoutubeSlot('${slot.id}')" title="Play inline" aria-label="Play ${slot.title}" class="absolute bottom-3 left-3 z-20 w-10 h-10 rounded-lg bg-black/60 backdrop-blur-xs border border-white/25 hover:bg-[#F0662F] hover:border-[#F0662F] hover:scale-105 flex items-center justify-center shadow-md transition-all duration-200 cursor-pointer"><svg viewBox="0 0 24 24" class="w-5 h-5 fill-white ml-0.5"><path d="M8 5.5v13l10.5-6.5z"/></svg></button></div>`;
+            el.dataset.videoState = posterState;
+          }
+        }
+      });
+    }
+
     function switchTaskTab(mode) {
       currentTaskTab = mode;
       const isPick = mode === "pick";
@@ -5028,6 +5329,8 @@
       if (stackHero) stackHero.classList.toggle("hidden", !isStack);
       if (towelHero) towelHero.classList.toggle("hidden", !isTowel);
       if (diceHero) diceHero.classList.toggle("hidden", !isDice);
+
+      syncTaskVideos();
 
       const btnPick = document.getElementById("task-tab-pick");
       const btnStack = document.getElementById("task-tab-stack");
@@ -5178,6 +5481,9 @@
     function setLanguage(lang) {
       currentLang = lang;
       document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      document.title = lang === "zh"
+        ? "UFACTORY AI | xArm6 具身智能物理操作评测报告 (AA-Robotics Benchmark)"
+        : "UFACTORY AI | xArm6 Tabletop Manipulation Benchmark (AA-Robotics)";
 
       const btnZh = document.getElementById("lang-btn-zh");
       const btnEn = document.getElementById("lang-btn-en");
@@ -5271,7 +5577,7 @@
       renderDiceTable();
     }
 
-    setLanguage("zh");
+    setLanguage("en");
 
     function updateBackToTopVisibility() {
       const btn = document.getElementById("back-to-top-btn");
